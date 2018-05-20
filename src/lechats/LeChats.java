@@ -22,8 +22,10 @@ public class LeChats extends PApplet {
 	 ControlP5 gui; 
 	 Button startLeChats; 
 	 final int MAX_ANGLE = 20; // due to the geometry of the seesaw, 45 turned out to be way too steep
-	 double q = 80;  
+	 double q = 105;  
 	 double k = 100; 
+	 float reactantSize = (float) 0.05;
+	 float productSize = (float) 0.05;
 	 public static void main(String[] args) {
 	        // TODO Auto-generated method stub
 		 PApplet.main("lechats.LeChats");//required for program to run; calls super of PApplet	
@@ -39,6 +41,8 @@ public class LeChats extends PApplet {
 		//^x, y, width, height
 		triangle((float)(width*0.45), (float)(height*0.61), (float)(width*0.5),(float)(height*0.525), (float)(width*0.55), (float)(height*0.61));
 		//x1, y1, x2, y2, x3, y3
+		rect((float)(width*0.2), (float)(height*0.50), (float)(width*0.05), (float)(height*0.05));
+		rect((float)(width*0.8), (float)(height*0.50), (float) (width*0.05), (float)(height*0.05));
 		
 		startLeChats = gui.addButton("Le Chats").setPosition((float)(width*0.90), (float)(height*0.875)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height));
 		startLeChats.addCallback(new CallbackListener() {
@@ -94,7 +98,6 @@ public class LeChats extends PApplet {
 		}
 		else if (Math.abs(angle-goalAngle)<0.05)
 		{
-			//rotateClockwise(0); 
 			angle = 0; 
 		}
 	}
@@ -105,8 +108,13 @@ public class LeChats extends PApplet {
 		System.out.println(); 
 		if (speed != 0)
 		{
-			if (angle < MAX_ANGLE) angle+=speed;
+			if (angle < MAX_ANGLE) {
+				angle+=speed;
+				if(productSize>=0.03) productSize-=0.001;
+				if(reactantSize<=0.2) reactantSize+=0.001;
+			}
 			background(255); 
+			
 			//clears the background
 			stroke(0); 
 			//clears the strokes, i think
@@ -119,6 +127,8 @@ public class LeChats extends PApplet {
 				//rotates the entire grid by the angle
 				rectMode(CENTER); 
 				rect(0,0, (float) (width*0.6), (float) (height*0.05)); 
+				rect((float)(width*-0.2), (float)(height*(-reactantSize/2-0.025)), (float)(width*reactantSize), (float)(height*reactantSize));
+				rect((float)(width*0.2), (float)(height*(-productSize/2-0.025)), (float) (width*productSize), (float)(height*productSize));
 				//since the new origin is the center of the old grid, the new position is (0,0) for the rect
 			popMatrix();
 			//reverted back to old system
@@ -134,7 +144,11 @@ public class LeChats extends PApplet {
 		System.out.println(); 
 		if (speed != 0)
 		{
-			if (angle > -MAX_ANGLE) angle-=speed;
+			if (angle > -MAX_ANGLE) {
+				angle-=speed;
+				if(productSize < 0.2) productSize+=0.001;
+				if(reactantSize > 0.03) reactantSize-=0.001;
+			}
 			background(255); 
 			//clears the background
 			stroke(0); 
@@ -148,6 +162,8 @@ public class LeChats extends PApplet {
 				//rotates the entire grid by the angle
 				rectMode(CENTER); 
 				rect(0,0, (float) (width*0.6), (float) (height*0.05)); 
+				rect((float)(width*-0.2), (float)(height*(-reactantSize/2-0.025)), (float)(width*reactantSize), (float)(height*reactantSize));
+				rect((float)(width*0.2), (float)(height*(-productSize/2-0.025)), (float) (width*productSize), (float)(height*productSize));
 				//since the new origin is the center of the old grid, the new position is (0,0) for the rect
 			popMatrix();
 			//reverted back to old system
