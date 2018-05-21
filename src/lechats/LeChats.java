@@ -1,5 +1,7 @@
 package lechats;
 
+import com.sun.corba.se.spi.orbutil.fsm.Action;
+
 import controlP5.Button;
 import controlP5.CallbackEvent;
 import controlP5.CallbackListener;
@@ -31,6 +33,9 @@ public class LeChats extends PApplet {
 	 float reactantSize = (float) 0.14;
 	 float productSize = (float) 0.14;
 	 float change = (float) 0.0; 
+	 float initReactantSize = (float) 0;
+	 float initProductSize = (float) 0;
+		boolean lechats = false;
 	 public static void main(String[] args) {
 	        // TODO Auto-generated method stub
 		 PApplet.main("lechats.LeChats");//required for program to run; calls super of PApplet	
@@ -40,7 +45,7 @@ public class LeChats extends PApplet {
 	}
 	 
 	public void setup() {
-		 gui = new ControlP5(this);
+		gui = new ControlP5(this);
 		rectMode(CENTER); //this unfortunately only exists for rects :( makes the position of the rect relative to its center
 		rect((float) (width*0.5), (float) (height*0.50), (float) (width*0.6), (float) (height*0.05));
 		//^x, y, width, height
@@ -49,44 +54,51 @@ public class LeChats extends PApplet {
 		rect((float)(width*0.2), (float)(height*0.50), (float)(width*0.05), (float)(height*0.05));
 		rect((float)(width*0.8), (float)(height*0.50), (float) (width*0.05), (float)(height*0.05));
 		
-		startLeChats = gui.addButton("Le Chats").setPosition((float)(width*0.90), (float)(height*0.875)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height));
+		startLeChats = gui.addButton("Le Chats").setPosition((float)(width*0.85), (float)(height*0.875)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height));
 		startLeChats.addCallback(new CallbackListener() {
 			@Override
 			public void controlEvent(CallbackEvent theEvent) {
-				System.out.println("LE CHATS ACTIVATED");
-						double currAngle = angle; 
-						double initialQ = q;
-						System.out.println("Q - K = "+(initialQ-k));
-						while (Math.abs(q-k)>0.05) {
-							if (q < k) {
-								change = (float) (Math.pow(reactantSize, 2) - Math.pow(productSize, 2))/(2*(productSize + reactantSize));
-								System.out.println("CHANGE: " + change);
-								rotateTo(0);
-								
-							}
-							else if (q > k)
-							{
-								q-=1; 
-								rotateTo(0); 
-							}
-							else
-							{
-								System.out.println("Q = K"); 
-								System.out.println("ANGLE: " + angle);
-								//rotateClockwise(0); 
-								angle = 0; 
-							}
+//				switch(theEvent.getAction()) {
+//				case ControlP5.ACTION_:
+					System.out.println("LE CHATS ACTIVATED");
+					lechats = true;
+					double currAngle = angle; 
+					double initialQ = q;
+					System.out.println("Q - K = "+(initialQ-k));
+					if(Math.abs(q-k)>0.005) {
+						if (q < k) {
+							change = (float) (Math.pow(initReactantSize, 2) - Math.pow(initProductSize, 2))/(2*(initProductSize + initReactantSize));
+							System.out.println("CHANGE: " + change);
+							rotateTo(0);
+							
+						}
+						else if (q > k)
+						{
+							//q-=1; 
+							rotateTo(0); 
+						}
+						else
+						{
+							System.out.println("Q = K"); 
+							System.out.println("ANGLE: " + angle);
+							//rotateClockwise(0); 
+							lechats = false;
+							angle = 0; 
 						}
 					}
-			
+					//lechats=false;
+				//}
+			}
 		}); 
 		
 		increaseReactConc = gui.addButton("Increase Reactants").setPosition((float)(0.48*width), (float)(0.88*height)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height));
 		increaseReactConc.addCallback(new CallbackListener(){
 			@Override
 			public void controlEvent(CallbackEvent arg0) {
-				float n = (float) 0.001;
-				reactantSize += n;
+				//float n = (float) 0.001;
+				reactantSize += 0.001;
+				initReactantSize = reactantSize;
+				initProductSize = productSize;
 			}
 		}); 
 		
@@ -105,9 +117,12 @@ public class LeChats extends PApplet {
 	public void draw() {
 		q = (Math.pow(productSize, 2))/(Math.pow(reactantSize, 2));
 		// Controls the rotation of the seesaw based on q v.s. k
-		if (q < k && Math.abs(q-k)>0.05) rotateCounterClockwise(0.1); 
-		else if (q > k && Math.abs(q-k)>0.05) rotateClockwise(0.1);
-		else if(Math.abs(q-k)<0.05) { rotateTo(0); } 
+		if(!lechats)
+		{
+			if (q < k && Math.abs(q-k)>0.05) rotateCounterClockwise(0.1); 
+			else if (q > k && Math.abs(q-k)>0.05) rotateClockwise(0.1);
+			else if(Math.abs(q-k)<0.05) { rotateTo(0); } 
+		}
 	}
 	
 	public void rotateTo(double goalAngle)
@@ -136,8 +151,8 @@ public class LeChats extends PApplet {
 		{
 			if (angle < MAX_ANGLE) {
 				angle+=speed;
-			    productSize += change; 
-			    reactantSize-= change;
+			    productSize += change/200; 
+			    reactantSize-= change/200;
 			}
 			background(255); 
 			
