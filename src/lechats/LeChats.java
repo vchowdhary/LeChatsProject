@@ -231,8 +231,6 @@ public class LeChats extends PApplet {
 		System.out.println("PRODUCT SIZE: " + productSize);
 		System.out.println();
 		
-		textSize(32); 
-		text("Q > K", (float)(0.5*width), (float)(0.2*height)); 
 		fill(0, 0, 0); 
 		if (speed != 0)
 		{
@@ -262,6 +260,9 @@ public class LeChats extends PApplet {
 			//reverted back to old system
 			fill(175);
 			triangle((float)(width*0.45), (float)(height*0.61), (float)(width*0.5),(float)(height*0.525), (float)(width*0.55), (float)(height*0.61));
+			textSize(32); 
+			if(lechats) text("Q < K", (float)(0.5*width), (float)(0.2*height)); 
+			else text("Q > K", (float)(0.5*width), (float)(0.2*height)); 
 		}
 		else{
 			background(255); 
@@ -285,6 +286,9 @@ public class LeChats extends PApplet {
 			//reverted back to old system
 			fill(175);
 			triangle((float)(width*0.45), (float)(height*0.61), (float)(width*0.5),(float)(height*0.525), (float)(width*0.55), (float)(height*0.61));
+			textSize(32); 
+			text("Q = K", (float)(0.5*width), (float)(0.2*height)); 
+			
 		}
 	}
 	
@@ -322,6 +326,9 @@ public class LeChats extends PApplet {
 			//reverted back to old system
 			fill(175);
 			triangle((float)(width*0.45), (float)(height*0.61), (float)(width*0.5),(float)(height*0.525), (float)(width*0.55), (float)(height*0.61));
+			textSize(32); 
+			if(lechats) text("Q > K", (float)(0.5*width), (float)(0.2*height)); 
+			else text("Q < K", (float)(0.5*width), (float)(0.2*height)); 
 		}		
 	}
 
