@@ -3,9 +3,11 @@ package lechats;
 import com.sun.corba.se.spi.orbutil.fsm.Action;
 
 import controlP5.Button;
+import controlP5.CColor;
 import controlP5.CallbackEvent;
 import controlP5.CallbackListener;
 import controlP5.ControlP5;
+import controlP5.Textlabel;
 import processing.core.PApplet;
 
 /*
@@ -24,9 +26,14 @@ public class LeChats extends PApplet {
 	 ControlP5 gui; 
 	 Button startLeChats; 
 	 Button increaseReactConc; 
+	 boolean increaseReacts = false; 
 	 Button decreaseReactConc; 
+	 boolean decreaseReacts = false; 
 	 Button increaseProdConc; 
-	 Button decreaseProdConc; 
+	 boolean increaseProds = false; 
+	 Button decreaseProdConc;
+	 boolean decreaseProds = false; 
+	 Textlabel qLabel; 
 	 final int MAX_ANGLE = 20; // due to the geometry of the seesaw, 45 turned out to be way too steep
 	 double q = 1;  
 	 double k = 1; 
@@ -35,7 +42,7 @@ public class LeChats extends PApplet {
 	 float change = (float) 0.0; 
 	 float initReactantSize = (float) 0;
 	 float initProductSize = (float) 0;
-		boolean lechats = false;
+		boolean lechats = false; 
 	 public static void main(String[] args) {
 	        // TODO Auto-generated method stub
 		 PApplet.main("lechats.LeChats");//required for program to run; calls super of PApplet	
@@ -59,22 +66,31 @@ public class LeChats extends PApplet {
 			@Override
 			public void controlEvent(CallbackEvent theEvent) {
 //				switch(theEvent.getAction()) {
-//				case ControlP5.ACTION_:
+//				case (ControlP5.ACTION_ENTER):
+//				{
 					System.out.println("LE CHATS ACTIVATED");
 					lechats = true;
 					double currAngle = angle; 
 					double initialQ = q;
 					System.out.println("Q - K = "+(initialQ-k));
 					if(Math.abs(q-k)>0.005) {
+						System.out.println("INIT REACTANT SIZE: " + initReactantSize);
+						System.out.println("INIT PRODUCT SIZE: " + initProductSize);
 						if (q < k) {
-							change = (float) (Math.pow(initReactantSize, 2) - Math.pow(initProductSize, 2))/(2*(initProductSize + initReactantSize));
+							if (increaseReacts) change = (float) (initReactantSize - initProductSize)/2; 
+							if (decreaseProds) {
+								System.out.println("DECREASE PRODUCTS IS TRUE");
+								change = (float) ((Math.pow(initReactantSize, 2) - (Math.pow(initProductSize, 2)))/(2*(initReactantSize + initProductSize))); 
+							}
 							System.out.println("CHANGE: " + change);
 							rotateTo(0);
 							
 						}
 						else if (q > k)
 						{
-							//q-=1; 
+							if (decreaseReacts) change = (float) (initProductSize - initReactantSize)/2; 
+							if (increaseProds) change = (float) (Math.pow(initProductSize, 2) - Math.pow(initReactantSize, 2))/(2*(initReactantSize + initProductSize)); 
+							System.out.println("CHANGE: " + change);
 							rotateTo(0); 
 						}
 						else
@@ -84,44 +100,111 @@ public class LeChats extends PApplet {
 							//rotateClockwise(0); 
 							lechats = false;
 							angle = 0; 
+							change = 0; 
 						}
 					}
-					//lechats=false;
-				//}
+					else
+					{
+						lechats = false;
+						change = 0; 
+					}
+	
+					//break; 
+//				}	
+//				case(ControlP5.ACTION_LEAVE): rotateClockwise(0); 
+//				}
 			}
 		}); 
 		
-		increaseReactConc = gui.addButton("Increase Reactants").setPosition((float)(0.48*width), (float)(0.88*height)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height));
+		increaseReactConc = gui.addButton("Increase Reactants").setPosition((float)(0.36*width), (float)(0.88*height)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height));
 		increaseReactConc.addCallback(new CallbackListener(){
 			@Override
 			public void controlEvent(CallbackEvent arg0) {
-				//float n = (float) 0.001;
-				reactantSize += 0.001;
-				initReactantSize = reactantSize;
-				initProductSize = productSize;
+			switch(arg0.getAction())
+				{
+				case ControlP5.ACTION_CLICK: 
+					//float n = (float) 0.001;
+					reactantSize += 0.01;
+					initReactantSize = reactantSize;
+					initProductSize = productSize;
+					increaseReacts = true; 
+				}	
 			}
 		}); 
 		
-		decreaseReactConc = gui.addButton("Decrease Reactants").setPosition((float)(0.60*width), (float)(0.88*height)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height)); 
+		decreaseReactConc = gui.addButton("Decrease Reactants")
+				.setPosition((float)(0.48*width), (float)(0.88*height))
+				.setWidth((int)(0.1*width)).setHeight((int)(0.1*height)); 
 		decreaseReactConc.addCallback(new CallbackListener(){
 
 			@Override
 			public void controlEvent(CallbackEvent arg0) {
-				reactantSize -= 0.001; 
+				switch(arg0.getAction())
+				{
+				case(ControlP5.ACTION_CLICK): {
+					reactantSize -= 0.01; 
+					initReactantSize = reactantSize;
+					initProductSize = productSize;
+					decreaseReacts = true;
+				}
+				}
 			}
 			
 		});
 		
+		increaseProdConc = gui.addButton("Increase Prodcuts").setPosition((float)(0.60*width), (float)(0.88*height)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height)); 
+		increaseProdConc.addCallback(new CallbackListener(){
+
+			@Override
+			public void controlEvent(CallbackEvent arg0) {
+				switch(arg0.getAction())
+				{
+				case ControlP5.ACTION_CLICK: 
+				{
+					productSize += 0.01; 
+					initReactantSize = reactantSize; 
+					initProductSize = productSize;
+					increaseProds = true;
+				}
+				}	
+			}
+			
+		});
+		
+		decreaseProdConc = gui.addButton("Decrease Products").setPosition((float)(0.72*width), (float)(0.88*height)).setWidth((int)(0.1*width)).setHeight((int)(0.1*height)); 
+		decreaseProdConc.addCallback(new CallbackListener(){
+
+			@Override
+			public void controlEvent(CallbackEvent arg0) {
+				switch(arg0.getAction()){
+				case ControlP5.ACTION_CLICK: 
+				{
+					productSize -= 0.01; 
+					initReactantSize = reactantSize; 
+					initProductSize = productSize; 
+					decreaseProds = true; 
+				}
+				}
+			}
+		});
+		
+	//	qLabel = gui.addTextlabel("qLabel").setText("Q v.s. K").setPosition((float)(0.5*width), (float)(0.3*height)).setColorValue(0xf000000).setFont(createFont("Georgia", 20)); 
+		
 	}
 
 	public void draw() {
-		q = (Math.pow(productSize, 2))/(Math.pow(reactantSize, 2));
+	//	q = (Math.pow(productSize, 2))/(Math.pow(reactantSize, 2));
+		q = productSize/reactantSize; 
+		//if (Math.abs(q-k)<0.05) lechats = false; 
 		// Controls the rotation of the seesaw based on q v.s. k
 		if(!lechats)
 		{
 			if (q < k && Math.abs(q-k)>0.05) rotateCounterClockwise(0.1); 
 			else if (q > k && Math.abs(q-k)>0.05) rotateClockwise(0.1);
-			else if(Math.abs(q-k)<0.05) { rotateTo(0); } 
+			else if(Math.abs(q-k)<0.05) { 
+				rotateTo(0);
+				lechats = false; 
+		    } 
 		}
 	}
 	
@@ -146,7 +229,11 @@ public class LeChats extends PApplet {
 		System.out.println("ANGLE: " + angle);
 		System.out.println("REACTANT SIZE: " + reactantSize);
 		System.out.println("PRODUCT SIZE: " + productSize);
-		System.out.println(); 
+		System.out.println();
+		
+		textSize(32); 
+		text("Q > K", (float)(0.5*width), (float)(0.2*height)); 
+		fill(0, 0, 0); 
 		if (speed != 0)
 		{
 			if (angle < MAX_ANGLE) {
@@ -177,7 +264,7 @@ public class LeChats extends PApplet {
 			triangle((float)(width*0.45), (float)(height*0.61), (float)(width*0.5),(float)(height*0.525), (float)(width*0.55), (float)(height*0.61));
 		}
 		else{
-background(255); 
+			background(255); 
 			
 			//clears the background
 			stroke(0); 
@@ -212,8 +299,8 @@ background(255);
 		{
 			if (Math.abs(angle + MAX_ANGLE) > 0.05) {
 				angle-=speed;
-			    productSize -= change; 
-			    reactantSize+= change;
+			    productSize -= change/200; 
+			    reactantSize+= change/200;
 			}
 			background(255); 
 			//clears the background
